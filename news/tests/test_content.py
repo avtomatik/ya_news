@@ -1,8 +1,3 @@
-
-# =============================================================================
-# Анонимному пользователю недоступна форма для отправки комментария на странице отдельной новости, а авторизованному доступна.
-# =============================================================================
-
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -11,6 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from news.forms import CommentForm
 from news.models import Comment, News
 
 User = get_user_model()
@@ -72,3 +68,13 @@ class TestDetailPage(TestCase):
         all_timestamps = [comment.created for comment in all_comments]
         sorted_timestamps = sorted(all_timestamps)
         self.assertEqual(all_timestamps, sorted_timestamps)
+
+    def test_anonymous_client_has_no_form(self):
+        response = self.client.get(self.detail_url)
+        self.assertNotIn('form', response.context)
+
+    def test_authorized_client_has_form(self):
+        self.client.force_login(self.author)
+        response = self.client.get(self.detail_url)
+        self.assertIn('form', response.context)
+        self.assertIsInstance(response.context['form'], CommentForm)
