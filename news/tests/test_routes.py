@@ -1,9 +1,12 @@
 from http import HTTPStatus
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from news.models import News
+from news.models import Comment, News
+
+User = get_user_model()
 
 
 class TestRoutes(TestCase):
@@ -11,6 +14,13 @@ class TestRoutes(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.news = News.objects.create(title='Заголовок', text='Текст')
+        cls.author = User.objects.create(username='Лев Толстой')
+        cls.reader = User.objects.create(username='Читатель простой')
+        cls.comment = Comment.objects.create(
+            news=cls.news,
+            author=cls.author,
+            text='Текст комментария'
+        )
 
     def test_pages_availability(self):
         urls = (
@@ -25,6 +35,19 @@ class TestRoutes(TestCase):
                 url = reverse(name, args=args)
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_availability_for_comment_edit_and_delete(self):
+        user_statuses = (
+            (self.author, HTTPStatus.OK),
+            (self.reader, HTTPStatus.NOT_FOUND),
+        )
+        for user, status in user_statuses:
+            self.client.force_login(user)
+            for name in ('news:edit', 'news:delete'):
+                with self.subTest(user=user, name=name):
+                    url = reverse(name, args=(self.comment.id,))
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, status)
 
 
 # =============================================================================
