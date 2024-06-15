@@ -13,6 +13,10 @@ class TestNews(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
+        cls.news = News.objects.create(
+            title=cls.TITLE,
+            text=cls.TEXT,
+        )
         cls.user = User.objects.create(username='testUser')
         cls.user_client = Client()
         cls.user_client.force_login(cls.user)
