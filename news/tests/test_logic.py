@@ -1,5 +1,4 @@
 # =============================================================================
-# Если комментарий содержит запрещённые слова, он не будет опубликован, а форма вернёт ошибку.
 # Авторизованный пользователь может редактировать или удалять свои комментарии.
 # Авторизованный пользователь не может редактировать или удалять чужие комментарии.
 # =============================================================================
@@ -8,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from news.forms import BAD_WORDS, WARNING
 from news.models import Comment, News
 
 User = get_user_model()
@@ -40,3 +40,15 @@ class TestCommentCreation(TestCase):
         self.assertEqual(comment.text, self.COMMENT_TEXT)
         self.assertEqual(comment.news, self.news)
         self.assertEqual(comment.author, self.user)
+
+    def test_user_cant_use_bad_words(self):
+        bad_words_data = {'text': f'Какой-то текст, {BAD_WORDS[0]}, ещё текст'}
+        response = self.auth_client.post(self.url, data=bad_words_data)
+        self.assertFormError(
+            response,
+            form='form',
+            field='text',
+            errors=WARNING
+        )
+        comments_count = Comment.objects.count()
+        self.assertEqual(comments_count, 0)
