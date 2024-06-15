@@ -49,9 +49,11 @@ class TestRoutes(TestCase):
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status)
 
-
-# =============================================================================
-# Страницы удаления и редактирования комментария доступны автору комментария.
-# При попытке перейти на страницу редактирования или удаления комментария анонимный пользователь перенаправляется на страницу авторизации.
-# Авторизованный пользователь не может зайти на страницы редактирования или удаления чужих комментариев (возвращается ошибка 404).
-# =============================================================================
+    def test_redirect_for_anonymous_client(self):
+        login_url = reverse('users:login')
+        for name in ('news:edit', 'news:delete'):
+            with self.subTest(name=name):
+                url = reverse(name, args=(self.comment.id,))
+                redirect_url = f'{login_url}?next={url}'
+                response = self.client.get(url)
+                self.assertRedirects(response, redirect_url)
