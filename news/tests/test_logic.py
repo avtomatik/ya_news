@@ -1,5 +1,4 @@
 # =============================================================================
-# Авторизованный пользователь может отправить комментарий.
 # Если комментарий содержит запрещённые слова, он не будет опубликован, а форма вернёт ошибку.
 # Авторизованный пользователь может редактировать или удалять свои комментарии.
 # Авторизованный пользователь не может редактировать или удалять чужие комментарии.
@@ -31,3 +30,13 @@ class TestCommentCreation(TestCase):
         self.client.post(self.url, data=self.form_data)
         comments_count = Comment.objects.count()
         self.assertEqual(comments_count, 0)
+
+    def test_user_can_create_comment(self):
+        response = self.auth_client.post(self.url, data=self.form_data)
+        self.assertRedirects(response, f'{self.url}#comments')
+        comments_count = Comment.objects.count()
+        self.assertEqual(comments_count, 1)
+        comment = Comment.objects.get()
+        self.assertEqual(comment.text, self.COMMENT_TEXT)
+        self.assertEqual(comment.news, self.news)
+        self.assertEqual(comment.author, self.user)
