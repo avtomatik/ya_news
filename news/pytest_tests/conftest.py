@@ -3,9 +3,15 @@ from datetime import datetime, timedelta
 import pytest
 from django.conf import settings
 from django.test.client import Client
+from django.urls import reverse
 from django.utils import timezone
 
 from news.models import Comment, News
+
+
+@pytest.fixture(autouse=True)
+def autouse_db(db):
+    ...
 
 
 @pytest.fixture
@@ -77,3 +83,38 @@ def comments_to_news(author, news):
         )
         for index in range(10)
     )
+
+
+@pytest.fixture
+def comment_update_url(comment):
+    return reverse('news:edit', args=(comment.id,))
+
+
+@pytest.fixture
+def comment_delete_url(comment):
+    return reverse('news:delete', args=(comment.id,))
+
+
+@pytest.fixture
+def news_home_url():
+    return reverse('news:home')
+
+
+@pytest.fixture
+def news_detail_url(news):
+    return reverse('news:detail', args=(news.id,))
+
+
+@pytest.fixture
+def users_login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def users_logout_url():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def users_signup_url():
+    return reverse('users:signup')
