@@ -3,23 +3,27 @@ from http import HTTPStatus
 import pytest
 from pytest_django.asserts import assertRedirects
 
+from .conftest import (CLIENT_AUTHOR, CLIENT_DEFAULT, CLIENT_NOT_AUTHOR,
+                       COMMENT_DELETE_URL, COMMENT_UPDATE_URL, NEWS_DETAIL_URL,
+                       NEWS_HOME_URL, USERS_LOGIN_URL, USERS_LOGOUT_URL,
+                       USERS_SIGNUP_URL)
 from .constants import FORM_DATA_NEW
 
 
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     (
-        (pytest.lazy_fixture('client'), HTTPStatus.OK),
+        (CLIENT_DEFAULT, HTTPStatus.OK),
     )
 )
 @pytest.mark.parametrize(
     'url',
     (
-        pytest.lazy_fixture('news_home_url'),
-        pytest.lazy_fixture('news_detail_url'),
-        pytest.lazy_fixture('users_login_url'),
-        pytest.lazy_fixture('users_logout_url'),
-        pytest.lazy_fixture('users_signup_url')
+        NEWS_HOME_URL,
+        NEWS_DETAIL_URL,
+        USERS_LOGIN_URL,
+        USERS_LOGOUT_URL,
+        USERS_SIGNUP_URL
     )
 )
 def test_pages_availability_for_anonymous_user(
@@ -41,16 +45,13 @@ def test_pages_availability_for_anonymous_user(
 @pytest.mark.parametrize(
     'parametrized_client, expected_status',
     (
-        (pytest.lazy_fixture('not_author_client'), HTTPStatus.NOT_FOUND),
-        (pytest.lazy_fixture('author_client'), HTTPStatus.OK)
+        (CLIENT_NOT_AUTHOR, HTTPStatus.NOT_FOUND),
+        (CLIENT_AUTHOR, HTTPStatus.OK)
     )
 )
 @pytest.mark.parametrize(
     'url',
-    (
-        pytest.lazy_fixture('comment_update_url'),
-        pytest.lazy_fixture('comment_delete_url')
-    )
+    (COMMENT_UPDATE_URL, COMMENT_DELETE_URL)
 )
 def test_pages_availability_for_different_users(
     parametrized_client, url, expected_status
@@ -85,10 +86,7 @@ def test_user_cant_delete_comment_of_another_user(
 
 @pytest.mark.parametrize(
     'url',
-    (
-        pytest.lazy_fixture('comment_update_url'),
-        pytest.lazy_fixture('comment_delete_url')
-    )
+    (COMMENT_UPDATE_URL, COMMENT_DELETE_URL)
 )
 def test_redirect_for_anonymous_client(client, url, users_login_url):
     """

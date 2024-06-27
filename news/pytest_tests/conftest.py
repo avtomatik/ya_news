@@ -5,7 +5,6 @@ from django.conf import settings
 from django.test.client import Client
 from django.urls import reverse
 from django.utils import timezone
-
 from news.models import Comment, News
 
 
@@ -118,3 +117,24 @@ def users_logout_url():
 @pytest.fixture
 def users_signup_url():
     return reverse('users:signup')
+
+
+CLIENT_DEFAULT = pytest.lazy_fixture('client')
+
+CLIENT_NOT_AUTHOR = pytest.lazy_fixture('not_author_client')
+
+CLIENT_AUTHOR = pytest.lazy_fixture('author_client')
+
+COMMENT_UPDATE_URL = pytest.lazy_fixture('comment_update_url')
+
+COMMENT_DELETE_URL = pytest.lazy_fixture('comment_delete_url')
+
+NEWS_HOME_URL = pytest.lazy_fixture('news_home_url')
+
+NEWS_DETAIL_URL = pytest.lazy_fixture('news_detail_url')
+
+USERS_LOGIN_URL = pytest.lazy_fixture('users_login_url')
+
+USERS_LOGOUT_URL = pytest.lazy_fixture('users_logout_url')
+
+USERS_SIGNUP_URL = pytest.lazy_fixture('users_signup_url')

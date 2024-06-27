@@ -1,7 +1,6 @@
-from pytest_django.asserts import assertFormError, assertRedirects
-
 from news.forms import BAD_WORDS, WARNING
 from news.models import Comment
+from pytest_django.asserts import assertFormError, assertRedirects
 
 from .constants import COMMENT_TEXT, FORM_DATA, FORM_DATA_NEW, NEW_COMMENT_TEXT
 
