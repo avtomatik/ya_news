@@ -11,24 +11,20 @@ from .constants import FORM_DATA_NEW
 
 
 @pytest.mark.parametrize(
-    'parametrized_client, expected_status',
+    'parametrized_client, url, expected_status',
     (
-        (CLIENT_DEFAULT, HTTPStatus.OK),
+        (CLIENT_DEFAULT, NEWS_HOME_URL, HTTPStatus.OK),
+        (CLIENT_DEFAULT, NEWS_DETAIL_URL, HTTPStatus.OK),
+        (CLIENT_DEFAULT, USERS_LOGIN_URL, HTTPStatus.OK),
+        (CLIENT_DEFAULT, USERS_LOGOUT_URL, HTTPStatus.OK),
+        (CLIENT_DEFAULT, USERS_SIGNUP_URL, HTTPStatus.OK),
+        (CLIENT_NOT_AUTHOR, COMMENT_UPDATE_URL, HTTPStatus.NOT_FOUND),
+        (CLIENT_NOT_AUTHOR, COMMENT_DELETE_URL, HTTPStatus.NOT_FOUND),
+        (CLIENT_AUTHOR, COMMENT_UPDATE_URL, HTTPStatus.OK),
+        (CLIENT_AUTHOR, COMMENT_DELETE_URL, HTTPStatus.OK),
     )
 )
-@pytest.mark.parametrize(
-    'url',
-    (
-        NEWS_HOME_URL,
-        NEWS_DETAIL_URL,
-        USERS_LOGIN_URL,
-        USERS_LOGOUT_URL,
-        USERS_SIGNUP_URL
-    )
-)
-def test_pages_availability_for_anonymous_user(
-    parametrized_client, url, expected_status
-):
+def test_pages_availability(parametrized_client, url, expected_status):
     """
     Главная страница доступна анонимному пользователю.
 
@@ -37,26 +33,6 @@ def test_pages_availability_for_anonymous_user(
 
     Страница отдельной новости доступна анонимному пользователю.
 
-    """
-    response = parametrized_client.get(url)
-    assert response.status_code == expected_status
-
-
-@pytest.mark.parametrize(
-    'parametrized_client, expected_status',
-    (
-        (CLIENT_NOT_AUTHOR, HTTPStatus.NOT_FOUND),
-        (CLIENT_AUTHOR, HTTPStatus.OK)
-    )
-)
-@pytest.mark.parametrize(
-    'url',
-    (COMMENT_UPDATE_URL, COMMENT_DELETE_URL)
-)
-def test_pages_availability_for_different_users(
-    parametrized_client, url, expected_status
-):
-    """
     Страницы удаления и редактирования комментария доступны автору
     комментария.
 
