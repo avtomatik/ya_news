@@ -7,7 +7,6 @@ from .conftest import (CLIENT_AUTHOR, CLIENT_DEFAULT, CLIENT_NOT_AUTHOR,
                        COMMENT_DELETE_URL, COMMENT_UPDATE_URL, NEWS_DETAIL_URL,
                        NEWS_HOME_URL, USERS_LOGIN_URL, USERS_LOGOUT_URL,
                        USERS_SIGNUP_URL)
-from .constants import FORM_DATA_NEW
 
 
 @pytest.mark.parametrize(
@@ -22,6 +21,8 @@ from .constants import FORM_DATA_NEW
         (CLIENT_NOT_AUTHOR, COMMENT_DELETE_URL, HTTPStatus.NOT_FOUND),
         (CLIENT_AUTHOR, COMMENT_UPDATE_URL, HTTPStatus.OK),
         (CLIENT_AUTHOR, COMMENT_DELETE_URL, HTTPStatus.OK),
+        (CLIENT_NOT_AUTHOR, COMMENT_UPDATE_URL, HTTPStatus.NOT_FOUND),
+        (CLIENT_NOT_AUTHOR, COMMENT_DELETE_URL, HTTPStatus.NOT_FOUND),
     )
 )
 def test_pages_availability(parametrized_client, url, expected_status):
@@ -39,25 +40,13 @@ def test_pages_availability(parametrized_client, url, expected_status):
     Авторизованный пользователь не может зайти на страницы редактирования или
     удаления чужих комментариев (возвращается ошибка 404).
 
+    Авторизованный пользователь не может редактировать чужие комментарии.
+
+    Авторизованный пользователь не может удалять чужие комментарии.
+
     """
     response = parametrized_client.get(url)
     assert response.status_code == expected_status
-
-
-def test_user_cant_edit_comment_of_another_user(
-    not_author_client, comment_update_url
-):
-    """Авторизованный пользователь не может редактировать чужие комментарии."""
-    response = not_author_client.post(comment_update_url, data=FORM_DATA_NEW)
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-
-def test_user_cant_delete_comment_of_another_user(
-    not_author_client, comment_delete_url
-):
-    """Авторизованный пользователь не может удалять чужие комментарии."""
-    response = not_author_client.delete(comment_delete_url)
-    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.parametrize(
